@@ -116,9 +116,23 @@ class OrderController extends Controller
             'sku' => 'required|string',
         ]);
 
-        $order = Order::where('sku', $request->sku)->first();
+        // Find the first PENDING order with this SKU
+        $order = Order::where('sku', $request->sku)
+                      ->where('status', 'pending')
+                      ->orderBy('created_at', 'asc')
+                      ->first();
 
         if (!$order) {
+            // Check if any order exists with this SKU
+            $completedOrder = Order::where('sku', $request->sku)->first();
+
+            if ($completedOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'All orders with this SKU have been printed',
+                ], 404);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found',
