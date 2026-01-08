@@ -85,7 +85,13 @@ class OrderController extends Controller
 
         if ($request->hasFile('upload_file')) {
             $file = $request->file('upload_file');
-            $filename = $request->sku . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+            // Store the original filename (without extension) as order_id
+            $data['order_id'] = $originalFilename;
+
+            // Use order_id as the filename
+            $filename = $originalFilename . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('orders', $filename, 'public');
             $data['upload_file'] = $path;
         }

@@ -72,6 +72,7 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scanned At</th>
@@ -83,6 +84,7 @@
                 @foreach($orders as $order)
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-semibold text-blue-600">{{ $order->order_id ?? 'N/A' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap font-mono">{{ $order->sku }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
