@@ -8,9 +8,9 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Orders Management</h2>
             <div class="flex space-x-2">
-                <button onclick="printOrderList()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                <a href="{{ route('admin.orders.print-list', request()->all()) }}" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                     🖨️ Print Order List
-                </button>
+                </a>
                 <a href="{{ route('admin.orders.scan-step1') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Scan New Label
                 </a>
@@ -111,8 +111,9 @@
                                 🖨️ Print
                             </button>
                         @elseif($order->status === 'completed')
-                            <span class="text-gray-400 mr-3">✓ Printed</span>
-                        @else
+ <button onclick="printFile('{{ asset('storage/' . $order->upload_file) }}')" class="text-green-600 hover:text-green-900 mr-3 cursor-pointer">
+                                🖨️Printed
+                            </button>                        @else
                             <span class="text-gray-400 mr-3">No File</span>
                         @endif
                         <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline">
@@ -150,56 +151,6 @@
             }, 500);
         };
     }
-
-    function printOrderList() {
-        window.print();
-    }
 </script>
 @endpush
 
-@push('styles')
-<style>
-    @media print {
-        /* Hide everything except the table */
-        nav, .bg-gray-50, .mb-4, button, form, a, .flex.space-x-2 {
-            display: none !important;
-        }
-
-        /* Show only the table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: left;
-        }
-
-        /* Hide action columns when printing */
-        th:last-child, td:last-child {
-            display: none;
-        }
-
-        /* Add page title */
-        body::before {
-            content: "Orders List";
-            display: block;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        /* Add print date */
-        body::after {
-            content: "Printed on: " attr(data-print-date);
-            display: block;
-            margin-top: 20px;
-            text-align: center;
-            font-size: 12px;
-        }
-    }
-</style>
-@endpush

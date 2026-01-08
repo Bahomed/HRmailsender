@@ -26,6 +26,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Orders
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/print-list', [OrderController::class, 'printOrderList'])->name('orders.print-list');
         Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
         // Scan Step 1 - SKU Label Scanning

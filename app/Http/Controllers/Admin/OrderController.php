@@ -182,4 +182,38 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully');
     }
+
+    public function printOrderList(Request $request)
+    {
+        $query = Order::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('sku', 'like', "%{$search}%");
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereDate('scanned_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('scanned_at', '<=', $request->date_to);
+        }
+
+        // Sort
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Get all orders (no pagination for print)
+        $orders = $query->get();
+
+        return view('admin.orders.print-list', compact('orders'));
+    }
 }
