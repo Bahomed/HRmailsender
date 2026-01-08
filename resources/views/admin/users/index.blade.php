@@ -12,6 +12,50 @@
             </a>
         </div>
 
+        <!-- Search and Filter Form -->
+        <form method="GET" action="{{ route('admin.users.index') }}" class="mb-6 bg-gray-50 p-4 rounded">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Name or Email"
+                           class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Admin Status</label>
+                    <select name="is_admin" class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">All</option>
+                        <option value="1" {{ request('is_admin') == '1' ? 'selected' : '' }}>Admin</option>
+                        <option value="0" {{ request('is_admin') == '0' ? 'selected' : '' }}>Regular</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Per Page</label>
+                    <select name="per_page" class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
+                        <option value="20" {{ request('per_page', 20) == '20' ? 'selected' : '' }}>20</option>
+                        <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end space-x-2">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-1.5 px-4 rounded">
+                        Filter
+                    </button>
+                    <a href="{{ route('admin.users.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm font-bold py-1.5 px-4 rounded">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Info -->
+        <div class="mb-4 text-sm text-gray-600">
+            Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} users
+        </div>
+
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>

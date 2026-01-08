@@ -23,6 +23,16 @@
             </div>
 
             <div id="orderDetails" class="hidden">
+                <!-- Print Button at Top -->
+                <div class="flex justify-between items-center mb-4">
+                    <button id="printBtn" onclick="printUploadedPdf()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-8 rounded text-lg">
+                        🖨️ Print PDF
+                    </button>
+                    <button onclick="resetScan()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded">
+                        Scan Another
+                    </button>
+                </div>
+
                 <div class="border rounded-lg p-6 mb-4" id="orderContent">
                     <h3 class="text-xl font-bold mb-4">Order Details</h3>
                     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -55,15 +65,6 @@
                     <div id="noFileMessage" class="hidden p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
                         No file uploaded for this order.
                     </div>
-                </div>
-
-                <div class="flex justify-center space-x-4">
-                    <button id="printBtn" onclick="printUploadedPdf()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded">
-                        Print PDF
-                    </button>
-                    <button onclick="resetScan()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded">
-                        Scan Another
-                    </button>
                 </div>
             </div>
         </div>
@@ -130,6 +131,8 @@
         const pdfViewer = document.getElementById('pdfViewer');
         const printBtn = document.getElementById('printBtn');
 
+        orderDetails.classList.remove('hidden');
+
         if (order.upload_file) {
             const fileUrl = '/storage/' + order.upload_file;
             const fileExt = order.upload_file.split('.').pop().toLowerCase();
@@ -140,12 +143,26 @@
                 pdfViewerSection.classList.remove('hidden');
                 noFileMessage.classList.add('hidden');
                 printBtn.classList.remove('hidden');
+
+                // Auto-print after PDF loads
+                pdfViewer.onload = function() {
+                    setTimeout(() => {
+                        autoPrint();
+                    }, 1000); // Wait 1 second for PDF to fully load
+                };
             } else if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
                 // Display image in iframe
                 pdfViewer.src = fileUrl;
                 pdfViewerSection.classList.remove('hidden');
                 noFileMessage.classList.add('hidden');
                 printBtn.classList.remove('hidden');
+
+                // Auto-print after image loads
+                pdfViewer.onload = function() {
+                    setTimeout(() => {
+                        autoPrint();
+                    }, 500);
+                };
             } else {
                 pdfViewerSection.classList.add('hidden');
                 noFileMessage.classList.remove('hidden');
@@ -157,11 +174,15 @@
             printBtn.classList.add('hidden');
         }
 
-        orderDetails.classList.remove('hidden');
         barcodeInput.value = '';
     }
 
-    function printUploadedPdf() {
+    async function autoPrint() {
+        // Automatically trigger print
+        await printUploadedPdf();
+    }
+
+    async function printUploadedPdf() {
         if (currentOrder && currentOrder.upload_file) {
             const pdfViewer = document.getElementById('pdfViewer');
 
@@ -169,11 +190,48 @@
                 // Print the iframe content directly
                 pdfViewer.contentWindow.focus();
                 pdfViewer.contentWindow.print();
+
+                // Mark order as printed and update status to completed
+                await markAsPrinted(currentOrder.id);
             } catch (e) {
                 // Fallback: if iframe print fails, open in new tab
                 const fileUrl = '/storage/' + currentOrder.upload_file;
                 window.open(fileUrl, '_blank');
+
+                // Mark order as printed
+                await markAsPrinted(currentOrder.id);
             }
+        }
+    }
+
+    async function markAsPrinted(orderId) {
+        try {
+            const response = await fetch('{{ route('admin.orders.mark-as-printed') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ order_id: orderId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update the order status in the UI
+                document.getElementById('orderStatus').textContent = 'Completed';
+                currentOrder.status = 'completed';
+
+                // Show success message
+                console.log('Order marked as completed');
+
+                // After a short delay, reset and focus back to scan input
+                setTimeout(() => {
+                    resetScan();
+                }, 2000); // Wait 2 seconds before resetting
+            }
+        } catch (error) {
+            console.error('Error marking order as printed:', error);
         }
     }
 

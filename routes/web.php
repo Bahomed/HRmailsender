@@ -36,6 +36,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Scan Print Page - Barcode Scanner & PDF Print
         Route::get('/orders/scan-print', [OrderController::class, 'scanPrint'])->name('orders.scan-print');
         Route::post('/orders/find-by-sku', [OrderController::class, 'findBySku'])->name('orders.find-by-sku');
+        Route::post('/orders/mark-as-printed', [OrderController::class, 'markAsPrinted'])->name('orders.mark-as-printed');
         Route::get('/orders/{order}/pdf', [OrderController::class, 'generatePdf'])->name('orders.pdf');
     });
 });

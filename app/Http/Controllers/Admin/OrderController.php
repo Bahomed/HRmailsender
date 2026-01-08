@@ -9,9 +9,38 @@ use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::latest()->paginate(20);
+        $query = Order::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('sku', 'like', "%{$search}%");
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereDate('scanned_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('scanned_at', '<=', $request->date_to);
+        }
+
+        // Sort
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Pagination
+        $perPage = $request->get('per_page', 20);
+        $orders = $query->paginate($perPage)->withQueryString();
+
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -99,6 +128,28 @@ class OrderController extends Controller
     public function generatePdf(Order $order)
     {
         return view('admin.orders.pdf', compact('order'));
+    }
+
+    public function markAsPrinted(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->status !== 'completed') {
+            $order->update([
+                'status' => 'completed',
+                'printed_at' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order marked as completed',
+            'order' => $order,
+        ]);
     }
 
     public function destroy(Order $order)

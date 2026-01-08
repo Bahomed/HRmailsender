@@ -12,6 +12,62 @@
             </a>
         </div>
 
+        <!-- Search and Filter Form -->
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="mb-6 bg-gray-50 p-4 rounded">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search SKU</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Enter SKU"
+                           class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">All</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}"
+                           class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}"
+                           class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Per Page</label>
+                    <select name="per_page" class="w-full px-3 py-1.5 text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
+                        <option value="20" {{ request('per_page', 20) == '20' ? 'selected' : '' }}>20</option>
+                        <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 mt-4">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-1.5 px-4 rounded">
+                    Filter
+                </button>
+                <a href="{{ route('admin.orders.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm font-bold py-1.5 px-4 rounded">
+                    Reset
+                </a>
+            </div>
+        </form>
+
+        <!-- Results Info -->
+        <div class="mb-4 text-sm text-gray-600">
+            Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} orders
+        </div>
+
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
