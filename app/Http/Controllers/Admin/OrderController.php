@@ -74,7 +74,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'sku' => 'required|string|unique:orders,sku',
-            'upload_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'upload_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $data = [

@@ -25,11 +25,11 @@
 
                 <div id="fileUploadSection" class="hidden">
                     <label for="upload_file" class="block text-sm font-medium text-gray-700 mb-2">
-                        Upload File (Optional)
+                        Upload File <span class="text-red-500">*</span>
                     </label>
-                    <input type="file" name="upload_file" id="upload_file" accept=".pdf,.jpg,.jpeg,.png"
+                    <input type="file" name="upload_file" id="upload_file" accept=".pdf,.jpg,.jpeg,.png" required
                            class="mt-1 block w-full">
-                    <p class="mt-2 text-sm text-gray-500">Allowed: PDF, JPG, PNG (Max 10MB)</p>
+                    <p class="mt-2 text-sm text-gray-500">Required: PDF, JPG, PNG (Max 10MB)</p>
                 </div>
 
                 <div class="flex justify-end space-x-3">
