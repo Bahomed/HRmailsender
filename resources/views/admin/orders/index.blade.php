@@ -99,7 +99,13 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{{ route('admin.orders.pdf', $order) }}" target="_blank" class="text-green-600 hover:text-green-900 mr-3">Print</a>
+                        @if($order->upload_file)
+                            <button onclick="printFile('{{ asset('storage/' . $order->upload_file) }}')" class="text-green-600 hover:text-green-900 mr-3 cursor-pointer">
+                                🖨️ Print
+                            </button>
+                        @else
+                            <span class="text-gray-400 mr-3">No File</span>
+                        @endif
                         <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
@@ -117,3 +123,23 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function printFile(fileUrl) {
+        // Create a hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = fileUrl;
+        document.body.appendChild(iframe);
+
+        // Wait for the file to load, then print
+        iframe.onload = function() {
+            setTimeout(function() {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }, 500);
+        };
+    }
+</script>
+@endpush
