@@ -55,15 +55,7 @@ class OrderController extends Controller
             'sku' => 'required|string',
         ]);
 
-        $exists = Order::where('sku', $request->sku)->exists();
-
-        if ($exists) {
-            return response()->json([
-                'exists' => true,
-                'message' => 'SKU already exists in the system!',
-            ], 409);
-        }
-
+        // SKU duplicates are now allowed, always return available
         return response()->json([
             'exists' => false,
             'message' => 'SKU is available',
@@ -73,7 +65,7 @@ class OrderController extends Controller
     public function storeScan(Request $request)
     {
         $request->validate([
-            'sku' => 'required|string|unique:orders,sku',
+            'sku' => 'required|string',
             'upload_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
@@ -86,6 +78,14 @@ class OrderController extends Controller
         if ($request->hasFile('upload_file')) {
             $file = $request->file('upload_file');
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+            // Check if order_id already exists
+            if (Order::where('order_id', $originalFilename)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order ID (filename) already exists! Please rename the file.',
+                ], 409);
+            }
 
             // Store the original filename (without extension) as order_id
             $data['order_id'] = $originalFilename;

@@ -133,6 +133,23 @@
 
         orderDetails.classList.remove('hidden');
 
+        // Check if order is already printed (completed)
+        if (order.status === 'completed') {
+            pdfViewerSection.classList.add('hidden');
+            noFileMessage.innerHTML = '<strong class="text-yellow-600">⚠️ This order has already been printed!</strong>';
+            noFileMessage.classList.remove('hidden', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+            noFileMessage.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+            printBtn.classList.add('hidden');
+
+            // Auto reset after 3 seconds
+            setTimeout(() => {
+                resetScan();
+            }, 3000);
+
+            barcodeInput.value = '';
+            return;
+        }
+
         if (order.upload_file) {
             const fileUrl = '/storage/' + order.upload_file;
             const fileExt = order.upload_file.split('.').pop().toLowerCase();

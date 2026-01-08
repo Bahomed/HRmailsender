@@ -141,6 +141,9 @@
                     successMessage.classList.add('hidden');
                     skuInput.focus();
                 }, 2000);
+            } else {
+                // Show error message for duplicate order_id
+                showStatus('error', data.message);
             }
         } catch (error) {
             alert('Error saving order');
