@@ -72,6 +72,8 @@ class MailSenderController extends Controller
                 Config::set('mail.mailers.smtp.encryption', $smtp['encryption']);
                 Config::set('mail.from.address', $smtp['from_email']);
                 Config::set('mail.from.name', $smtp['from_name']);
+                // Reset cached mailer so new SMTP settings take effect
+                app('mail.manager')->forgetMailers();
             }
 
             // Handle attachment if provided
