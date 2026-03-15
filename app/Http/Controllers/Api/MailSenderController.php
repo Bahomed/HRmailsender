@@ -120,7 +120,7 @@ class MailSenderController extends Controller
             if (isset($attachmentPath) && file_exists($attachmentPath)) {
                 unlink($attachmentPath);
             }
-
+             dd($smtp,$e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send email',
